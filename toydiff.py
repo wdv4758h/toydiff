@@ -61,7 +61,6 @@ def check_shell():
     return check_command(shells)
 
 
-
 def bsdiff(old, new, output):
     sh.bsdiff(old, new, output)
 
