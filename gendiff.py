@@ -12,10 +12,15 @@ def get_parser():
     return parser
 
 
+def homedir_replace(string):
+    if string.startswith('~/'):
+        string = string.replace('~/', sh.HOME, 1)
+    return string
+
+
 def get_filetype(filepath):
     if isinstance(filepath, str):
-        if filepath.startswith('~/'):
-            filepath = filepath.replace('~/', sh.HOME, 1)
+        filepath = homedir_replace(filepath)
         return sh.file(filepath, '-b', '--mime')
     else:
         raise TypeError('argument type must be "str"')
