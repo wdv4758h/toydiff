@@ -111,6 +111,7 @@ def main():
     output_file = homedir_replace(output_file)
 
     binary = is_bin(old_file)
+    prewrite = ''
 
     if binary:
         if check_command('bsdiff'):
@@ -120,14 +121,15 @@ def main():
             return
         else:
             patch = xxd_diff(old_file, new_file)
+            prewrite = 'xxd_diff\n'
     else:
         patch = diff(old_file, new_file)
 
     if output_file:
         with open(output_file, 'w') as f:
-            print(patch, file=f)
+            print('{}{}'.format(prewrite, patch), file=f)
     else:
-        print(patch)
+        print('{}{}'.format(prewrite, patch))
 
 if __name__ == '__main__':
     main()
