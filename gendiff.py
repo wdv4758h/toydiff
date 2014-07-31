@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+from collections import Iterable
 import sh
 
 
@@ -36,14 +37,21 @@ def is_bin(filepath):
 
 
 def check_command(cmds=()):
-    exist = {}
-    for i in cmds:
+    if isinstance(cmds, Iterable):
+        exist = {}
+        for i in cmds:
+            try:
+                eval('sh.{}'.format(i))
+                exist[i] = True
+            except sh.CommandNotFound:
+                exist[i] = False
+        return exist
+    else:
         try:
             eval('sh.{}'.format(i))
-            exist[i] = True
-        except sh.CommandNotFound:
-            exist[i] = False
-    return exist
+            return True
+        except:
+            return False
 
 
 def check_shell():
