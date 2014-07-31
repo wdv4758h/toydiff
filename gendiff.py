@@ -8,8 +8,10 @@ import sh
 
 def get_parser():
     parser = argparse.ArgumentParser(description='compare files')
-    parser.add_argument('old_file', metavar='old_file', type=str, nargs=1)
-    parser.add_argument('new_file', metavar='new_file', type=str, nargs=1)
+    add_arg = parser.add_argument
+    add_arg('old_file', metavar='old_file', type=str, nargs=1)
+    add_arg('new_file', metavar='new_file', type=str, nargs=1)
+    add_arg('output_file', metavar='patch', type=str, nargs='?', default='')
     return parser
 
 
@@ -59,6 +61,11 @@ def check_shell():
     return check_command(shells)
 
 
+
+def bsdiff(old, new, output):
+    sh.bsdiff(old, new, output)
+
+
 def diff(old, new):
     # diff will return 1
     return sh.diff(old, new, _iter=True, _ok_code=[0, 1])
@@ -98,15 +105,30 @@ def main():
     args = vars(parser.parse_args())
     old_file = args['old_file'][0]
     new_file = args['new_file'][0]
+    output_file = args['output_file']
+
+    old_file = homedir_replace(old_file)
+    new_file = homedir_replace(new_file)
+    output_file = homedir_replace(output_file)
 
     binary = is_bin(old_file)
 
     if binary:
-        patch = xxd_diff(old_file, new_file)
+        if check_command('bsdiff'):
+            if not output_file:
+                output_file = 'bs.patch'
+            bsdiff(old_file, new_file, output_file)
+            return
+        else:
+            patch = xxd_diff(old_file, new_file)
     else:
         patch = diff(old_file, new_file)
 
-    print(patch)
+    if output_file:
+        with open(output_file, 'w') as f:
+            print(patch, file=f)
+    else:
+        print(patch)
 
 if __name__ == '__main__':
     main()
