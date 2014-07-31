@@ -1,10 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import argparse
 import sh
 
 
-def filetype(filepath):
+def get_parser():
+    parser = argparse.ArgumentParser(description='compare files')
+    parser.add_argument('old_file', metavar='old_file', type=str, nargs=1)
+    parser.add_argument('new_file', metavar='new_file', type=str, nargs=1)
+    return parser
+
+
+def get_filetype(filepath):
     if isinstance(filepath, str):
         if filepath.startswith('~/'):
             filepath = filepath.replace('~/', sh.HOME, 1)
@@ -18,5 +26,5 @@ def is_bin(filepath):
     binary file detect
     '''
 
-    mime = filetype(filepath)
+    mime = get_filetype(filepath)
     return mime.partition(';')[0].endswith('x-executable')
