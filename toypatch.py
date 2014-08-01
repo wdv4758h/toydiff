@@ -28,26 +28,26 @@ def get_patchtype(filepath):
         return 'binary'
 
 
-def bspatch(old, new, patch):
+def bspatch(old, new, patch_file):
     if new:
-        sh.bspatch(old, new, patch)
+        sh.bspatch(old, new, patch_file)
     else:
-        sh.bspatch(old, old+'.new', patch)
+        sh.bspatch(old, old+'.new', patch_file)
 
 
-def patch(old, new, patch):
+def patch(old, new, patch_file):
     if new:
         sh.cp('-f', old, new)
-        sh.patch(new, patch)
+        sh.patch(new, patch_file)
     else:
-        sh.patch(old, patch)
+        sh.patch(old, patch_file)
 
 
-def xxd_patch(old, new, patch):
+def xxd_patch(old, new, patch_file):
     tmp_old = '/var/tmp/old_hex'
     sh.xxd('-p', old, _out=tmp_old)
-    sh.tail('-n', '+2', patch, _out=patch+'.nohead')
-    sh.patch(tmp_old, patch+'.nohead')
+    sh.tail('-n', '+2', patch_file, _out=patch_file+'.nohead')
+    sh.patch(tmp_old, patch_file+'.nohead')
 
     if new:
         sh.xxd('-r', '-p', tmp_old, _out=new)
@@ -61,21 +61,21 @@ def main():
     parser = get_parser()
     args = vars(parser.parse_args())
     old_file = args['old_file'][0]
-    patch = args['patch'][0]
+    patch_file = args['patch'][0]
     output_file = args['output_file']
 
     old_file = homedir_replace(old_file)
-    patch = homedir_replace(patch)
+    patch_file = homedir_replace(patch_file)
     output_file = homedir_replace(output_file)
 
-    patch_type = get_patchtype(patch)
+    patch_type = get_patchtype(patch_file)
 
     if patch_type == 'binary':
-        bspatch(old_file, output_file, patch)
+        bspatch(old_file, output_file, patch_file)
     elif patch_type == 'xxd_diff':
-        xxd_patch(old_file, output_file, patch)
+        xxd_patch(old_file, output_file, patch_file)
     else:
-        patch(old_file, output_file, patch)
+        patch(old_file, output_file, patch_file)
 
 
 if __name__ == '__main__':
