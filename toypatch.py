@@ -1,7 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import argparse
 import sh
+
+
+def get_parser():
+    parser = argparse.ArgumentParser(description='compare files')
+    add_arg = parser.add_argument
+    add_arg('old_file', metavar='old_file', type=str, nargs=1)
+    add_arg('patch', metavar='patch', type=str, nargs=1)
+    add_arg('output_file', metavar='new_file', type=str, nargs='?', default='')
+    return parser
 
 
 def bspatch(old, new, patch):
