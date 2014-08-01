@@ -55,6 +55,7 @@ def xxd_patch(old, new, patch_file):
         sh.xxd('-r', '-p', tmp_old, _out=old)
 
     sh.rm('-f', tmp_old)
+    sh.rm('-f', patch_file+'.nohead')
 
 
 def main():
